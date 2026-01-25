@@ -14,8 +14,8 @@ pipeline {
                 echo 'Running unit tests with pytest'
                 bat '''
                     python --version
-                    pip install pytest
-                    pytest -q
+                    python -m pip install pytest
+                    python -m pytest -q
                 '''
             }
         }
