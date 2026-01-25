@@ -5,7 +5,6 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                // Pull code from GitHub SCM
                 checkout scm
             }
         }
@@ -13,9 +12,9 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Running unit tests with pytest'
-                sh '''
-                    python3 --version
-                    pip3 install --user pytest
+                bat '''
+                    python --version
+                    pip install pytest
                     pytest -q
                 '''
             }
@@ -24,22 +23,24 @@ pipeline {
         stage('Package') {
             steps {
                 echo 'Packaging python file into wheel: calculator-1.0.0.whl'
-                sh '''
-                    # Install build tools
-                    python3 -m pip install --user --upgrade pip
-                    python3 -m pip install --user setuptools wheel
+                bat '''
+                    REM Install build tools
+                    python -m pip install --upgrade pip
+                    pip install setuptools wheel
 
-                    # Clean previous builds
-                    rm -rf build dist *.egg-info
+                    REM Clean previous builds
+                    rmdir /s /q build 2>nul
+                    rmdir /s /q dist 2>nul
+                    del /q *.egg-info 2>nul
 
-                    # Build wheel
-                    python3 setup.py bdist_wheel
+                    REM Build wheel
+                    python setup.py bdist_wheel
 
-                    # Rename wheel to exact required name
-                    mv dist/*.whl dist/calculator-1.0.0.whl
+                    REM Rename wheel to exact required name
+                    for %%f in (dist\\*.whl) do rename "%%f" calculator-1.0.0.whl
 
-                    # Verify
-                    ls -l dist
+                    REM Verify
+                    dir dist
                 '''
             }
         }
